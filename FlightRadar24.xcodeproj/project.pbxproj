@@ -11,6 +11,7 @@
 		AEAB26282B0515FD0010758D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEAB26272B0515FD0010758D /* ContentView.swift */; };
 		AEAB262A2B0515FE0010758D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AEAB26292B0515FE0010758D /* Assets.xcassets */; };
 		AEAB262D2B0515FE0010758D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AEAB262C2B0515FE0010758D /* Preview Assets.xcassets */; };
+		AEDFEB192B08FF72003CE53E /* PlaneManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEDFEB182B08FF72003CE53E /* PlaneManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +20,7 @@
 		AEAB26272B0515FD0010758D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AEAB26292B0515FE0010758D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AEAB262C2B0515FE0010758D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		AEDFEB182B08FF72003CE53E /* PlaneManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaneManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,8 +53,9 @@
 		AEAB26242B0515FD0010758D /* FlightRadar24 */ = {
 			isa = PBXGroup;
 			children = (
-				AEAB26252B0515FD0010758D /* FlightRadar24App.swift */,
 				AEAB26272B0515FD0010758D /* ContentView.swift */,
+				AEDFEB182B08FF72003CE53E /* PlaneManager.swift */,
+				AEAB26252B0515FD0010758D /* FlightRadar24App.swift */,
 				AEAB26292B0515FE0010758D /* Assets.xcassets */,
 				AEAB262B2B0515FE0010758D /* Preview Content */,
 			);
@@ -137,6 +140,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AEDFEB192B08FF72003CE53E /* PlaneManager.swift in Sources */,
 				AEAB26282B0515FD0010758D /* ContentView.swift in Sources */,
 				AEAB26262B0515FD0010758D /* FlightRadar24App.swift in Sources */,
 			);

@@ -1,20 +1,50 @@
+
 import SwiftUI
 import MapKit
 
+struct PlaneAnnotation: Identifiable {
+    var id = UUID()
+    var coordinate: CLLocationCoordinate2D
+}
+struct AirplaneView: View {
+    var body: some View {
+        Image(systemName: "airplane")
+            .resizable()
+            .frame(width: 20, height: 20)
+            .foregroundColor(.black)
+    }
+}
+
 struct ContentView: View {
+    @StateObject var planeManager = PlaneManager()
     
     @State private var region = MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
             span: MKCoordinateSpan(latitudeDelta: 1.0, longitudeDelta: 1.0)
         )
+    
+    // Additional state for the plane annotations
+       @State private var planeAnnotations: [PlaneAnnotation] = [
+           PlaneAnnotation(coordinate: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194)),
+           // Add more PlaneAnnotations with their respective coordinates
+           PlaneAnnotation(coordinate: CLLocationCoordinate2D(latitude: 37.8770, longitude: -122.4194))
+       ]
+
 
     var body: some View {
         NavigationView {
             ZStack(alignment: .top) {
+                
                 // Map
-                Map(coordinateRegion: .constant(region))
-                                   .edgesIgnoringSafeArea(.all)
-                                   .blur(radius: 0.1)
+                                Map(coordinateRegion: $region, showsUserLocation: false, userTrackingMode: nil, annotationItems: planeAnnotations) { annotation in
+                                    MapAnnotation(coordinate: annotation.coordinate) {
+                                        AirplaneView()
+                                    }
+                                }
+                                .edgesIgnoringSafeArea(.all)
+                                .blur(radius: 0.1)
+            
+        
 
                 // Gray overlay with status bar, search bar, and person icon
                 VStack(spacing: 0) {
@@ -78,6 +108,9 @@ struct ContentView: View {
                                     }
                         )
         }
+        .onAppear {
+                   planeManager.startFetchingLiveFlightData(apiKey: PlaneManager.apiKey)
+               }
     }
 }
 
@@ -164,6 +197,8 @@ struct CircleButtonsView: View {
                     .font(.system(size: 11))
             }
         }
+        
     }
+    
 }
 
