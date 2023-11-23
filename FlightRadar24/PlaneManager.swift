@@ -10,82 +10,79 @@ import SwiftUI
 import MapKit
 
 class PlaneManager: ObservableObject {
-    static let apiKey = "6047d021-3df8-4e0e-bf70-a7d59ff6b8e8"
-    @Published var planeAnnotations: [PlaneAnnotation] = []
+    static let apiKey = "your_airlabs_api_key"
+        @Published var planeAnnotations: [PlaneAnnotation] = []
 
-    func fetchFlightData(apiKey: String) {
-        guard let url = URL(string: "https://airlabs.co/api/v9/flights?api_key=\(apiKey)") else {
-            print("Invalid URL")
-            return
-        }
-
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error = error {
-                print("Error: \(error.localizedDescription)")
+        func fetchFlightData(apiKey: String) {
+            guard let url = URL(string: "https://airlabs.co/api/v9/flights?api_key=\(apiKey)") else {
+                print("Invalid URL")
                 return
             }
 
-            guard let data = data else {
-                print("No data received")
-                return
-            }
-
-            // Print the received JSON data
-            if let jsonString = String(data: data, encoding: .utf8) {
-                print("Received JSON: \(jsonString)")
-            }
-
-            do {
-                let decoder = JSONDecoder()
-                let flightData = try decoder.decode([FlightData].self, from: data)
-                DispatchQueue.main.async {
-                    self.updateAnnotations(with: flightData)
+            let task = URLSession.shared.dataTask(with: url) { data, response, error in
+                if let error = error {
+                    print("Error: \(error.localizedDescription)")
+                    return
                 }
-            } catch {
-                print("Error decoding JSON: \(error.localizedDescription)")
+
+                guard let data = data else {
+                    print("No data received")
+                    return
+                }
+
+                do {
+                    let decoder = JSONDecoder()
+                    let responseData = try decoder.decode(ResponseData.self, from: data)
+                    DispatchQueue.main.async {
+                        self.updateAnnotations(with: responseData.response)
+                    }
+                } catch {
+                    print("Error decoding JSON: \(error.localizedDescription)")
+                    print("Failed JSON: \(String(data: data, encoding: .utf8) ?? "N/A")")
+                }
+            }
+
+            task.resume()
+        }
+
+        private func updateAnnotations(with flightData: [FlightData]) {
+            planeAnnotations = flightData.map { FlightDataToPlaneAnnotationMapper.map($0) }
+        }
+
+        func startFetchingLiveFlightData(apiKey: String, interval: TimeInterval = 1200) {
+            // Initial fetch
+            fetchFlightData(apiKey: apiKey)
+
+            // Periodic fetch every 20 minutes (1200 seconds)
+            Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { timer in
+                self.fetchFlightData(apiKey: apiKey)
             }
         }
-
-        task.resume()
     }
 
 
-    private func updateAnnotations(with flightData: [FlightData]) {
-        planeAnnotations = flightData.map { FlightDataToPlaneAnnotationMapper.map($0) }
-    }
-
-    func startFetchingLiveFlightData(apiKey: String, interval: TimeInterval = 1200) {
-        // Initial fetch
-        fetchFlightData(apiKey: apiKey)
-
-        // Periodic fetch every 20 minutes (1200 seconds)
-        Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { timer in
-            self.fetchFlightData(apiKey: apiKey)
-        }
-    }
-}
-
-struct FlightData: Codable {
+struct FlightData: Codable, Identifiable {
+    let id = UUID()
     let hex: String
-    let regNumber: String
+    let reg_number: String
     let flag: String
     let lat: Double
     let lng: Double
-    let alt: Int
-    let dir: Int
-    let speed: Int
-    let vSpeed: Double
+    let alt: Double?
+    let dir: Double
+    let speed: Double?
+    let v_speed: Double
     let squawk: String
-    let flightNumber: String
-    let flightIcao: String
-    let flightIata: String
-    let depIcao: String
-    let depIata: String
-    let arrIcao: String
-    let arrIata: String
-    let airlineIcao: String
-    let airlineIata: String
-    let aircraftIcao: String
+    let flight_number: String
+    let flight_icao: String
+    let flight_iata: String
+    let dep_icao: String
+    let dep_iata: String
+    let arr_icao: String
+    let arr_iata: String
+    let airline_icao: String
+    let airline_iata: String
+    let aircraft_icao: String
     let updated: TimeInterval
     let status: String
 }
@@ -93,6 +90,9 @@ struct FlightData: Codable {
 struct FlightDataToPlaneAnnotationMapper {
     static func map(_ flightData: FlightData) -> PlaneAnnotation {
         let coordinate = CLLocationCoordinate2D(latitude: flightData.lat, longitude: flightData.lng)
-        return PlaneAnnotation(coordinate: coordinate)
+        // Assuming 'dir' property represents the rotation angle
+        let rotation = flightData.dir
+        return PlaneAnnotation(coordinate: coordinate, rotation: rotation)
     }
 }
+
